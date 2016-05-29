@@ -14,33 +14,27 @@
 
 package fr.jetoile.hadoopunit.component;
 
-import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.SocketOptions;
 import fr.jetoile.hadoopunit.Component;
+import fr.jetoile.hadoopunit.HadoopBootstrap;
 import fr.jetoile.hadoopunit.HadoopUnitConfig;
 import fr.jetoile.hadoopunit.exception.BootstrapException;
+import fr.jetoile.hadoopunit.exception.NotFoundServiceException;
 import info.archinnov.achilles.embedded.CassandraEmbeddedServerBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.thrift.transport.TTransportException;
-//import org.cassandraunit.dataset.CQLDataSet;
-//import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Map;
+
+//import org.cassandraunit.dataset.CQLDataSet;
+//import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 
 public class CassandraBootstrap implements Bootstrap {
     final public static String NAME = Component.CASSANDRA.name();
@@ -149,4 +143,16 @@ public class CassandraBootstrap implements Bootstrap {
         return this.session;
     }
 
+    final public static void main(String... args) throws NotFoundServiceException {
+
+        HadoopBootstrap bootstrap = HadoopBootstrap.INSTANCE;
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                bootstrap.stopAll();
+            }
+        });
+
+        bootstrap.add(Component.CASSANDRA).startAll();
+    }
 }
